@@ -1,0 +1,23 @@
+artifact_path: file:C:/Users/aaloise/Documents/desafio_sih_sus/mlruns/1/models/m-d0fa106cc4844864ae1b485931b910cc/artifacts
+flavors:
+  python_function:
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.sklearn
+    model_path: model.pkl
+    predict_fn: predict
+    python_version: 3.12.10
+  sklearn:
+    code: null
+    pickled_model: model.pkl
+    serialization_format: cloudpickle
+    sklearn_version: 1.8.0
+    skops_trusted_types: null
+mlflow_version: 3.12.0
+model_id: m-d0fa106cc4844864ae1b485931b910cc
+model_size_bytes: 665543
+model_uuid: m-d0fa106cc4844864ae1b485931b910cc
+prompts: null
+run_id: baa8a401e6ae498596b2554bfb732851
+utc_time_created: '2026-05-29 19:26:39.730945'

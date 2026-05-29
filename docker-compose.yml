@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  api-radar-sus:
+    build: .
+    container_name: API_RADAR_CUSTO_SUS
+    ports:
+      - "8000:8000"
+    environment:
+      - GIT_PYTHON_REFRESH=quiet
+    restart: always
