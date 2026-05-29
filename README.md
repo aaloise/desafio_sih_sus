@@ -97,20 +97,50 @@ python -m venv .venv
 # Instalar dependências
 python -m pip install -r requirements.txt
 ```
+## 2. Versionamento de Dados com DVC
 
-### 2. Pipeline de Dados e Treinamento
+Este projeto utiliza o **DVC (Data Version Control)** para versionar o dataset sem comitar arquivos grandes no Git. O dataset bruto (>65MB) não está no repositório — apenas os arquivos `.dvc` de metadados.
 
-```powershell
-# Passo A: Baixar os dados brutos
+### Por que usar DVC?
+- Evita estourar o limite de 100MB do GitHub
+- Mantém histórico de versões do dataset
+- Permite reprodução exata do ambiente de treino
+- Separa código (Git) de dados (DVC)
+
+### Como restaurar o dataset localmente
+
+```bash
+# 1. Instalar o DVC (se ainda não tiver)
+pip install dvc
+
+# 2. Inicializar o DVC no repositório (apenas na primeira vez)
+dvc init
+
+# 3. Configurar o remote local para armazenamento dos dados
+# Windows:
+dvc remote add -d local C:/dvcstore
+# Linux/Mac:
+dvc remote add -d local ~/dvcstore
+
+# 4. Baixar os dados versionados
+dvc pull
+```
+
+## 3. Pipeline de Dados e Treinamento
+
+### Passo A: Baixar os dados brutos
+```
 python src/baixar_dados.py
+```
 
-# Passo B: Executar a esteira completa
+### Passo B: Executar a esteira completa
+```
 python src/train.py
 ```
 
 **Observação:** a promoção automática do modelo campeão para o estágio de produção é realizada ao final do treinamento por meio da API do MLflow.
 
-### 3. Interface de Governança (MLflow)
+### 4. Interface de Governança (MLflow)
 
 ```powershell
 mlflow ui
