@@ -1,22 +1,46 @@
-\# Link do Repositório Oficial - Desafio SIH-SUS
+# Link do Repositório Oficial – Desafio SIH-SUS
 
+O código-fonte completo, histórico de commits, arquivos de configuração do Docker e artefatos de experimentação estão disponíveis no repositório público do GitHub:
 
+**🔗 Repositório:**
+https://github.com/aaloise/desafio_sih_sus
 
-O código-fonte completo, histórico de commits, arquivos de configuração do Docker e governança de experimentos estão disponíveis no repositório público do GitHub:
+## Conteúdo do Repositório
 
+* `src/app.py`
+  API de produção desenvolvida com FastAPI para inferência em tempo real.
 
+* `src/train.py`
+  Esteira automatizada de treinamento, validação cruzada, seleção de modelos e otimização de hiperparâmetros.
 
-👉 \*\*\[INSIRA\_AQUI\_O\_LINK\_DO\_SEU\_GITHUB]\*\*
+* `src/baixar_dados.py`
+  Script responsável pela ingestão automatizada dos dados do SIH-SUS.
 
+* `Dockerfile` e `docker-compose.yml`
+  Arquivos de infraestrutura para conteinerização e execução da aplicação em ambientes isolados.
 
+* `notebooks/`
+  Relatórios de Análise Exploratória de Dados (EDA) disponibilizados nos formatos:
 
-\### Conteúdo do Repositório:
+  * `.ipynb`
+  * `.html`
+  * `.pdf`
 
-\* `src/app.py`: API de Produção em FastAPI.
+* `mlruns/`
+  Repositório local de experimentos e métricas gerenciados pelo MLflow.
 
-\* `src/train.py`: Esteira automatizada com Triagem Competitiva (Decision Tree, XGBoost, LightGBM) e Validação Cruzada.
+## Tecnologias Utilizadas
 
-\* `Dockerfile` \& `docker-compose.yml`: Infraestrutura de conteinerização.
+* Python 3.12
+* Scikit-Learn
+* XGBoost
+* LightGBM
+* MLflow
+* FastAPI
+* Docker
+* Pandas
+* NumPy
 
-\* `notebooks/`: Relatório de Análise Exploratória de Dados (EDA) em formatos `.ipynb`, `.html` e `.pdf`.
+## Reprodutibilidade
 
+Todas as dependências necessárias para execução do projeto estão especificadas no arquivo `requirements.txt`, permitindo a reprodução integral dos experimentos e do ambiente de produção.
