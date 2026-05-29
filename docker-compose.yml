@@ -2,10 +2,27 @@ version: '3.8'
 
 services:
   api-radar-sus:
-    build: .
-    container_name: API_RADAR_CUSTO_SUS
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: radar_sih_sus_api
     ports:
       - "8000:8000"
+    restart: unless-stopped
+    volumes:
+      - ./mlruns:/app/mlruns
     environment:
-      - GIT_PYTHON_REFRESH=quiet
-    restart: always
+      - MLFLOW_TRACKING_URI=./mlruns
+      - PYTHONUNBUFFERED=1
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/saude"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    networks:
+      - radar-net
+
+networks:
+  radar-net:
+    driver: bridge
