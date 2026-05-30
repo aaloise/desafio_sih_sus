@@ -15,7 +15,6 @@ app = FastAPI(
 )
 
 # 2. Camada de Validação de Dados (Pydantic)
-# Mapeia exatamente o JSON esperado pelo ColumnTransformer do nosso Pipeline
 class PayloadPaciente(BaseModel):
     MUNIC_RES: str
     MUNIC_MOV: str
@@ -26,28 +25,40 @@ class PayloadPaciente(BaseModel):
     INSTRU: str
     GESTAO: str
 
-# 3. Carregamento Seguro do Modelo do Model Registry via Alias @production
+# 3. Carregamento Seguro e Auto-Detectável do Modelo
 try:
-    print("-> Carregando o modelo campeão a partir do Model Registry...")
-    # O MLflow resolve a URI nativamente buscando a Versão 4 marcada como estável
+    print("-> Tentando carregar o modelo via Model Registry...")
     model_uri = "models:/modelo_sih_sus_catastrofico@production"
     modelo_producao = mlflow.pyfunc.load_model(model_uri)
-    print("Sucesso! Modelo em @production acoplado e pronto para operação.")
+    print("Sucesso! Modelo em @production acoplado.")
 except Exception as e:
-    print(f"Alerta de Caminho: Carregamento por alias exigiu fallback físico ({e})")
-    import glob
-    # Fallback de segurança buscando a última pasta de artefatos gerada localmente
-    pastas_modelos = glob.glob("mlruns/**/artifacts/model", recursive=True)
+    print(f"Alerta: Carregamento por alias exigiu varredura física no container ({e})")
+    
+    # BUSCA IDENTIFICADORA DE ARTEFATOS: Localiza o modelo pelos arquivos obrigatórios do MLflow
+    pastas_modelos = []
+    for raiz, diretorios, arquivos in os.walk("."):
+        if "MLmodel" in arquivos or "model.pkl" in arquivos:
+            pastas_modelos.append(raiz)
+            
     if pastas_modelos:
+        pastas_modelos.sort()
         modelo_producao = mlflow.pyfunc.load_model(pastas_modelos[-1])
-        print(f"Modelo carregado via fallback local: {pastas_modelos[-1]}")
+        print(f"Modelo localizado e acoplado com sucesso via varredura: {pastas_modelos[-1]}")
     else:
-        raise RuntimeError("Erro Crítico: O artefato do modelo não foi localizado no servidor MLflow.")
+        # MAPEAMENTO DE SEGURANÇA: Se não achar nada, lista o conteúdo para auditoria visual imediata
+        mapeamento_pastas = []
+        if os.path.exists("mlruns"):
+            for r, d, f in os.walk("mlruns"):
+                if f:
+                    mapeamento_pastas.append(f"{r}: {f}")
+        raise RuntimeError(
+            f"Erro Crítico: Os arquivos físicos do modelo (model.pkl ou MLmodel) não foram encontrados em mlruns. "
+            f"Estrutura de arquivos existente no container: {mapeamento_pastas}"
+        )
 
 # 4. Endpoint de Health Check (Monitoramento de Saúde da API)
 @app.get("/")
 def checar_saude():
-    """Retorna o status operacional da API para ferramentas de monitoramento."""
     return {
         "status": "operacional",
         "modelo": "modelo_sih_sus_catastrofico",
@@ -57,12 +68,7 @@ def checar_saude():
 # 5. Endpoint de Inferência (Onde a predição acontece)
 @app.post("/predict")
 def predizer_risco_custo(paciente: PayloadPaciente):
-    """
-    Recebe os dados cadastrais da admissão de uma internação via JSON 
-    e infere se o custo final estourará o teto orçamentário do P90.
-    """
     try:
-        # Converte o payload do JSON recebido em um DataFrame estruturado de 1 linha
         dados_entrada = pd.DataFrame([{
             'MUNIC_RES': paciente.MUNIC_RES,
             'MUNIC_MOV': paciente.MUNIC_MOV,
@@ -74,11 +80,9 @@ def predizer_risco_custo(paciente: PayloadPaciente):
             'GESTAO': paciente.GESTAO
         }])
         
-        # O DataFrame bruto passa direto pelo Pipeline do scikit-learn carregado
         predicao = modelo_producao.predict(dados_entrada)
         classe_final = int(predicao[0])
         
-        # Mapeamento semântico da saída para facilitar a tomada de decisão do gestor do SUS
         if classe_final == 1:
             diagnostico_radar = "ALTO RISCO: Internação com alto potencial de Custo Catastrófico (Estouro do P90)."
         else:
