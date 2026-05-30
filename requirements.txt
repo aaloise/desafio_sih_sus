@@ -9,3 +9,4 @@ xgboost==2.0.3
 lightgbm==4.3.0
 matplotlib==3.8.4
 seaborn==0.13.2
+setuptools<82.0.0
