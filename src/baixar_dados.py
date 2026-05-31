@@ -7,7 +7,7 @@ def processar_csv_nacional_blindado():
     caminho_processed = "data/processed/sih_processed.csv"
     
     if not os.path.exists(caminho_raw):
-        print(f"❌ Erro: O arquivo '{caminho_raw}' não foi encontrado em data/raw/.")
+        print(f"Erro: O arquivo '{caminho_raw}' não foi encontrado em data/raw/.")
         return
 
     print("-> Analisando a estrutura e o cabeçalho do CSV...")
@@ -24,7 +24,7 @@ def processar_csv_nacional_blindado():
             
             # Se encontrar colunas essenciais, descobrimos o separador correto!
             if 'VAL_TOT' in colunas_reais or 'IDADE' in colunas_reais:
-                print(f"👉 Separador detectado com sucesso: '{sep}'")
+                print(f"Separador detectado com sucesso: '{sep}'")
                 
                 # Cria um mapeamento de 'NOME_MAIUSCULO' -> 'NomeOriginalDoArquivo'
                 mapa_cases = {str(c).upper().strip(): c for c in df_teste.columns}
@@ -56,13 +56,13 @@ def processar_csv_nacional_blindado():
                 # Salva o arquivo pronto para consumo do notebook de EDA
                 os.makedirs("data/processed", exist_ok=True)
                 df.to_csv(caminho_processed, index=False)
-                print(f"✅ Sucesso! Base nacional preparada e salva em: {caminho_processed}")
+                print(f"Sucesso! Base nacional preparada e salva em: {caminho_processed}")
                 return
                 
         except Exception as e:
             continue
 
-    print("❌ Erro crítico: Não foi possível mapear as colunas usando ',' ou ';'. Verifique o arquivo manualmente.")
+    print("Erro crítico: Não foi possível mapear as colunas usando ',' ou ';'. Verifique o arquivo manualmente.")
 
 if __name__ == "__main__":
     processar_csv_nacional_blindado()
